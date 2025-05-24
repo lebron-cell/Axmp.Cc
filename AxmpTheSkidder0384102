@@ -1,0 +1,98 @@
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local player = game.Players.LocalPlayer
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = game:GetService("CoreGui")
+
+local outlineFrame = Instance.new("Frame")
+outlineFrame.Size = UDim2.new(0, 110, 0, 60)
+outlineFrame.Position = UDim2.new(0.5, -55, 0.5, -30)
+outlineFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+outlineFrame.BackgroundTransparency = 0.6
+outlineFrame.Parent = screenGui
+
+local outlineCorner = Instance.new("UICorner")
+outlineCorner.CornerRadius = UDim.new(0, 14)
+outlineCorner.Parent = outlineFrame
+
+local button = Instance.new("TextButton")
+button.Size = UDim2.new(0, 100, 0, 50)
+button.Position = UDim2.new(0, 5, 0, 5)
+button.Text = "Click nigger"
+button.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+button.TextColor3 = Color3.new(1, 1, 1)
+button.Font = Enum.Font.Gotham
+button.TextSize = 15
+button.Parent = outlineFrame
+
+local buttonCorner = Instance.new("UICorner")
+buttonCorner.CornerRadius = UDim.new(0, 12)
+buttonCorner.Parent = button
+
+local dragging = false
+local dragInput
+local dragStart
+local startPos
+
+local function update(input)
+    local delta = input.Position - dragStart
+    outlineFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+outlineFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = outlineFrame.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+outlineFrame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and input == dragInput then
+        update(input)
+    end
+end)
+
+local toggled = false
+local function khen()
+    local dicks = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+    if not dicks then
+        return
+    end
+
+    RunService.RenderStepped:Connect(
+        function()
+            if toggled then
+                local camera = workspace.CurrentCamera
+                local cameraLook = camera.CFrame.LookVector
+                dicks.CFrame = CFrame.new(dicks.Position, dicks.Position + Vector3.new(cameraLook.X, 0, cameraLook.Z))
+            end
+        end
+    )
+end
+
+button.MouseButton1Click:Connect(
+    function()
+        toggled = not toggled
+        khen()
+    end
+)
+
+player.CharacterAdded:Connect(
+    function()
+        khen()
+    end
+)
